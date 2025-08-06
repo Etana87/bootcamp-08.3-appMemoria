@@ -8,16 +8,17 @@ import {
   parejaNoEncontrada,
 } from "./motor";
 
-// 📍 Referencias a DOM
+// Referencias a DOM
 const botonIniciar = document.getElementById("boton-iniciar") as HTMLButtonElement;
 const contenedorCartas = document.getElementById("tablero-cartas") as HTMLDivElement;
 
-// 🖼 Imagen de carta boca abajo
+// Imagen de carta boca abajo
 const IMG_BOCA_ABAJO = "/assets/back.png";
 
-// 🔁 Renderiza todas las cartas en el tablero
-const renderizarCartas = (): void => {
+// Renderiza todas las cartas en el tablero
+const renderizarCartas = (): void => { // HTML con CSS Grid y data-indice-array
   contenedorCartas.innerHTML = ""; // Limpiar tablero
+
   tablero.cartas.forEach((carta, indice) => {
     const divCarta = document.createElement("div");
     divCarta.classList.add("carta");
@@ -30,9 +31,13 @@ const renderizarCartas = (): void => {
     divCarta.appendChild(img);
     contenedorCartas.appendChild(divCarta);
   });
+
+  // Los listeners se agregan después de renderizar
+  agregarListenersCartas();
 };
 
-// 🔄 Actualiza solo dos cartas (tras comprobar pareja o no)
+
+// Actualiza solo dos cartas (tras comprobar pareja o no)
 const actualizarCartas = (indiceA: number, indiceB: number): void => {
   const imgs = contenedorCartas.querySelectorAll("img");
   [indiceA, indiceB].forEach((indice) => {
@@ -42,7 +47,7 @@ const actualizarCartas = (indiceA: number, indiceB: number): void => {
   });
 };
 
-// 👆 Lógica al clickear una carta
+// Lógica al clickear una carta
 const manejarClickCarta = (event: MouseEvent): void => {
   const target = event.currentTarget;
 
@@ -54,24 +59,27 @@ const manejarClickCarta = (event: MouseEvent): void => {
   if (!sePuedeVoltearLaCarta(tablero, indice)) return;
 
   voltearLaCarta(tablero, indice);
-  renderizarCartas();
 
   switch (tablero.estadoPartida) {
     case "CeroCartasLevantadas":
       tablero.estadoPartida = "UnaCartaLevantada";
       tablero.indiceCartaVolteadaA = indice;
+      renderizarCartas(); // <- Después de actualizar el estado
       break;
 
     case "UnaCartaLevantada":
       tablero.estadoPartida = "DosCartasLevantadas";
       tablero.indiceCartaVolteadaB = indice;
+      renderizarCartas();
 
       const indiceA = tablero.indiceCartaVolteadaA!;
       const indiceB = tablero.indiceCartaVolteadaB!;
 
-      if (sonPareja(indiceA, indiceB, tablero)) {
+      if (sonPareja(indiceA, indiceB, tablero)) { //  Comprobación de pareja
         parejaEncontrada(tablero, indiceA, indiceB);
-        setTimeout(() => renderizarCartas(), 500);
+        setTimeout(() => {
+          renderizarCartas();
+        }, 500);
       } else {
         setTimeout(() => {
           parejaNoEncontrada(tablero, indiceA, indiceB);
@@ -85,19 +93,21 @@ const manejarClickCarta = (event: MouseEvent): void => {
   }
 };
 
-// 🆕 Iniciar juego
+// Iniciar juego
 const iniciarJuego = (): void => {
+  contenedorCartas.innerHTML = ""; // Limpia tablero
   iniciaPartida(tablero);
   renderizarCartas();
   agregarListenersCartas();
 };
 
 const agregarListenersCartas = (): void => {
-  const divsCartas = contenedorCartas.querySelectorAll(".carta");
+  const divsCartas = contenedorCartas.querySelectorAll<HTMLDivElement>(".carta");
   divsCartas.forEach((div) => {
     div.addEventListener("click", manejarClickCarta);
   });
 };
 
-// 🟢 Listeners iniciales
-botonIniciar.addEventListener("click", iniciarJuego);
+
+// Listeners iniciales
+botonIniciar.addEventListener("click", iniciarJuego); // Botón para empezar partida
