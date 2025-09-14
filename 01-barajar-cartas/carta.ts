@@ -1,4 +1,4 @@
-// Definir carta, en este caso es un animal
+// Definir carta
 export interface Carta {
   id: number;
   contenido: string; 

@@ -21,7 +21,7 @@ export const sePuedeVoltearLaCarta = (tablero: Tablero, indice: number): boolean
   );
 };
 
-// ↩Voltear carta si es válido
+// Voltear carta si es válido
 export const voltearLaCarta = (tablero: Tablero, indice: number): void => {
   tablero.cartas[indice].estaVuelta = true;
 };
